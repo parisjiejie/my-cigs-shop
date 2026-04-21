@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --------------------------------------------------
+   修复：强制加深输入框文字颜色
+   使用标准 CSS 语法，兼容性最好，不会报错
+   --------------------------------------------------
+*/
+
+input, 
+textarea, 
+select {
+  /* 强制文字颜色为深黑色，确保清晰可见 */
+  color: #000000 !important; 
+  /* 强制背景为白色，防止某些浏览器默认透明导致看不清 */
+  background-color: #ffffff;
+  /* 稍微加深边框，增加对比度 */
+  border-color: #d1d5db; 
+}
+
+/* 加深提示文字 (Placeholder) 的颜色 */
+input::placeholder,
+textarea::placeholder {
+  /* 修改：使用更深的灰色 (#4b5563 / gray-600) 提高可读性 */
+  color: #4b5563 !important; 
+  opacity: 1;
+}
+
+/* 修复浏览器自动填充后背景变黄、文字变白的问题 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* --------------------------------------------------
+   全局可视性优化：加深所有浅灰色字体
+   解决 text-gray-500 在部分屏幕上看不太清的问题
+   --------------------------------------------------
+*/
+.text-gray-500 {
+  color: #4b5563 !important; /* 强制替换为 Gray-600 的颜色 */
+}
+
+.text-gray-400 {
+  color: #6b7280 !important; /* 强制替换为 Gray-500 的颜色 */
+}
