@@ -1,17 +1,5 @@
 import React from 'react';
-
-/**
- * 环境兼容性处理：
- * 这里的 try-catch 和 Mock 是为了确保代码在各种预览环境下都能正常编译。
- * 在您的本地项目中，它会自动识别并使用您真实的 globals.css 和 SessionProvider。
- */
-
-// 尝试引入全局样式
-try {
-  require('./globals.css');
-} catch (e) {
-  // 预览环境可能缺失此文件，忽略错误
-}
+import './globals.css';
 
 // 尝试引入 SessionProvider，如果失败则提供一个透明的 Mock 组件
 let SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
