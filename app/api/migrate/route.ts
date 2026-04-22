@@ -59,7 +59,7 @@ const productsToImport = [
   { name: 'Zhonghua Slim Chinese Red', brand: 'Zhonghua', category: 'Cigarette', price: 180, stock: 19 },
 ];
 
-function slugify(text) {
+function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 }
 
