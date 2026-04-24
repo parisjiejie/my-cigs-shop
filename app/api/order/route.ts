@@ -9,6 +9,7 @@ import Campaign from '@/lib/models/Campaign';
 import ShippingMethod from '@/lib/models/ShippingMethod'; 
 import { sendEmail } from '@/lib/email';
 import { evaluateAllCampaigns } from '@/lib/campaignHelper';
+import Settings from '@/lib/models/Settings';
 
 // 1. 生成订单号 (ORD + 年月日 + 4位自动递增)
 async function generateOrderNumber() {
@@ -37,7 +38,8 @@ async function generateOrderNumber() {
 
 // 2. 发送邮件通知 (包含详细 HTML)
 async function sendOrderConfirmationEmails(order: any) {
-    const adminEmail = "pap.shop.service@gmail.com";
+    const settings = await Settings.findOne({ key: 'global_settings' });
+    const adminEmail = settings?.adminEmail || "pap.shop.service@gmail.com";
     const customerEmail = order.shippingInfo.email;
     
     // 商品列表 HTML
@@ -110,7 +112,7 @@ async function sendOrderConfirmationEmails(order: any) {
             </div>
             
             <p style="margin-top: 25px; font-size: 14px; text-align: center; color: #555;">
-               If you have any questions, please contact us at <a href="mailto:pap.shop.service@gmail.com" style="color: #2563eb; text-decoration: none;">pap.shop.service@gmail.com</a>.
+               If you have any questions, please contact us at <a href="mailto:${adminEmail}" style="color: #2563eb; text-decoration: none;">${adminEmail}</a>.
             </p>
 
             <p style="text-align: center; margin-top: 10px; font-size: 12px; color: #999;">

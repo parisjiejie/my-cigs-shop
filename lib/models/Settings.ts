@@ -14,6 +14,9 @@ const SettingsSchema = new mongoose.Schema({
   smtpUser: { type: String }, // 您的邮箱账号
   smtpPassword: { type: String }, // 您的邮箱密码或应用专用密码
   smtpFrom: { type: String }, // 发件人显示名称，例如 "My Cigs <admin@...>"
+  
+  // 管理员通知邮箱
+  adminEmail: { type: String }, // 管理员接收订单通知的邮箱
 }, { timestamps: true });
 
 export default mongoose.models.Settings || mongoose.model('Settings', SettingsSchema);
