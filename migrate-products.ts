@@ -1,8 +1,15 @@
-import 'dotenv/config';
-import mongoose from 'mongoose';
-import dbConnect from './lib/dbConnect';
-import Category from './lib/models/Category';
-import Product from './lib/models/Product';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// ==========================================
+// 数据迁移脚本
+// ==========================================
+// 用途：将产品数据导入数据库
+// 默认目标：本地测试数据库 (mycigsdb_dev)
+// 如需导入正式数据库，请修改为加载 .env.production
+// ==========================================
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const productsToImport = [
   { name: 'Blueberry Blackberry Ice', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
@@ -67,6 +74,10 @@ function slugify(text: string): string {
 
 async function migrate() {
   try {
+    const dbConnect = (await import('./lib/dbConnect')).default;
+    const Category = (await import('./lib/models/Category')).default;
+    const Product = (await import('./lib/models/Product')).default;
+
     await dbConnect();
     console.log('Connected to database');
 

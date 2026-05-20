@@ -1,5 +1,13 @@
 import mongoose from 'mongoose';
 
+// ==========================================
+// 数据库连接配置
+// ==========================================
+// 本地开发环境 (.env.local) -> mycigsdb_dev (测试数据库)
+// 正式环境 (.env.production) -> mycigsdb_prod (正式数据库)
+// 注意：两个数据库完全独立，本地开发不会影响正式数据
+// ==========================================
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
