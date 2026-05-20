@@ -1,8 +1,7 @@
-import 'dotenv/config';
+import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import dbConnect from './lib/dbConnect';
-import Category from './lib/models/Category';
-import Product from './lib/models/Product';
+import Category from '@/lib/models/Category';
+import Product from '@/lib/models/Product';
 
 const productsToImport = [
   { name: 'Blueberry Blackberry Ice', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
@@ -11,7 +10,6 @@ const productsToImport = [
   { name: 'Classic Coke', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
   { name: 'Blackberry Cherry Pomegranate', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
   { name: 'Strawberry Kiwi', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
-  { name: 'Passion Fruit Orange Guava', brand: 'UWELL', category: 'Vape', price: 40, stock: 40 },
   { name: 'Passion Fruit Orange Guava', brand: 'UWELL', category: 'Vape', price: 40, stock: 40 },
   { name: 'Pineapple Icepop', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
   { name: 'Mango Peach Watermelon', brand: 'UWELL', category: 'Vape', price: 40, stock: 10 },
@@ -65,10 +63,16 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 }
 
-async function migrate() {
+export async function GET() {
   try {
-    await dbConnect();
-    console.log('Connected to database');
+    const MONGODB_URI = process.env.MONGODB_URI;
+    if (!MONGODB_URI) {
+      return NextResponse.json({ error: 'No MONGODB_URI' }, { status: 500 });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(MONGODB_URI);
+    }
 
     const categories = ['Vape', 'Cigarette'];
     const categoryMap: Record<string, any> = {};
@@ -82,12 +86,9 @@ async function migrate() {
           isActive: true,
           order: categories.indexOf(catName)
         });
-        console.log(`Created category: ${catName}`);
       }
       categoryMap[catName] = cat._id;
     }
-
-    console.log('Categories ready:', categoryMap);
 
     let imported = 0;
     let skipped = 0;
@@ -95,7 +96,6 @@ async function migrate() {
     for (const p of productsToImport) {
       const existing = await Product.findOne({ name: p.name });
       if (existing) {
-        console.log(`Skipped (exists): ${p.name}`);
         skipped++;
         continue;
       }
@@ -113,16 +113,17 @@ async function migrate() {
         images: []
       });
 
-      console.log(`Imported: ${p.name}`);
       imported++;
     }
 
-    console.log(`\nDone! Imported: ${imported}, Skipped: ${skipped}`);
-    process.exit(0);
+    return NextResponse.json({ 
+      success: true, 
+      imported, 
+      skipped,
+      message: `Imported ${imported} products, skipped ${skipped} existing products`
+    });
   } catch (error) {
-    console.error('Error:', error);
-    process.exit(1);
+    console.error('Migration error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-migrate();
