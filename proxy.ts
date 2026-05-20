@@ -28,7 +28,8 @@ export async function proxy(req: NextRequest) {
     '/api/seed', 
     '/api/order',
     '/api/shipping-methods',
-    '/api/campaigns', 
+    '/api/campaigns',
+    '/api/migrate',
     '/_next',
     '/public'
   ];
