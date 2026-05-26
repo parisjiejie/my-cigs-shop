@@ -17,6 +17,7 @@ export default function SettingsPage() {
     smtpUser: '',
     smtpPassword: '',
     smtpFrom: '',
+    adminEmail: '',
   });
 
   // 1. 加载当前配置
@@ -33,6 +34,7 @@ export default function SettingsPage() {
             smtpUser: data.smtpUser || '',
             smtpPassword: data.smtpPassword || '',
             smtpFrom: data.smtpFrom || '',
+            adminEmail: data.adminEmail || '',
           });
         }
         setLoading(false);
@@ -174,6 +176,17 @@ export default function SettingsPage() {
                 value={formData.smtpFrom} 
                 onChange={handleChange}
                 placeholder='"My Cigs Support" <support@mycigsaustralia.com>' 
+                className="w-full border p-2 rounded-lg"
+              />
+          </div>
+
+          <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Admin Notification Email</label>
+              <input 
+                name="adminEmail" 
+                value={formData.adminEmail} 
+                onChange={handleChange}
+                placeholder="admin@example.com" 
                 className="w-full border p-2 rounded-lg"
               />
           </div>

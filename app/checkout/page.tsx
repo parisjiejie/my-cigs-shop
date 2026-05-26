@@ -424,10 +424,10 @@ export default function CheckoutPage() {
                 Please transfer <span className="font-bold">${orderResult.finalTotal ? orderResult.finalTotal.toFixed(2) : '0.00'}</span> to the account below within 24 hours.
               </p>
               <div className="space-y-2 text-sm font-mono bg-white/60 p-4 rounded-lg border border-[#FDE68A] text-[#92400E]">
-                <div className="flex justify-between"><span>Bank Name:</span> <span className="font-bold">Commonwealth Bank</span></div>
-                <div className="flex justify-between"><span>Account Name:</span> <span className="font-bold">My Cigs Trading PTY LTD</span></div>
-                <div className="flex justify-between"><span>BSB:</span> <span className="font-bold">062-000</span></div>
-                <div className="flex justify-between"><span>Account Number:</span> <span className="font-bold">1234 5678</span></div>
+                <div className="flex justify-between"><span>BSB:</span> <span className="font-bold">033161</span></div>
+                <div className="flex justify-between"><span>ACC:</span> <span className="font-bold">643665</span></div>
+                <div className="flex justify-between"><span>Name:</span> <span className="font-bold">zhen-hong yang</span></div>
+                <div className="flex justify-between"><span>Bank:</span> <span className="font-bold">westpac</span></div>
               </div>
             </div>
             

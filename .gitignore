@@ -31,7 +31,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
+<<<<<<< HEAD
 .env*
+=======
+.env
+.env.local
+.env.production
+!.env.production.template
+>>>>>>> 72d99db8481b6f4929631df5996f5ba7ef637add
 
 # vercel
 .vercel
@@ -40,7 +47,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+<<<<<<< HEAD
 .vercel
 .env*.local
 
+=======
+>>>>>>> 72d99db8481b6f4929631df5996f5ba7ef637add
 /lib/generated/prisma

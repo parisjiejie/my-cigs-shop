@@ -183,9 +183,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
                   Please transfer the total amount to the account below. Use your <strong>Order Number</strong> as reference.
                 </p>
                 <div className="bg-white/60 p-3 rounded-lg text-sm font-mono text-yellow-900">
-                  <p>Bank: Commonwealth Bank</p>
-                  <p>BSB: 062-000</p>
-                  <p>ACC: 1234 5678</p>
+                  <p>BSB: 033161</p>
+                  <p>ACC: 643665</p>
+                  <p>Name: zhen-hong yang</p>
+                  <p>Bank: westpac</p>
                   <p>Ref: {formattedOrder.orderNumber}</p>
                 </div>
               </div>
