@@ -71,6 +71,7 @@ export default async function AdminDashboard() {
     customerName: order.customerName,
     phone: order.phone,
     carrier: order.carrier,
+    paymentReminderStopped: order.paymentReminderStopped || false,
     createdAt: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A',
     shippingInfo: order.shippingInfo || {
         fullName: order.customerName || 'Guest',
