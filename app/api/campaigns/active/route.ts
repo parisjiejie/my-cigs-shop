@@ -18,13 +18,9 @@ export async function GET() {
     // 注意：$exists: false 不会匹配 null 值，所以用 null 来匹配无日期限制的情况
     const campaigns = await Campaign.find({
       isActive: true,
-      $or: [
-        { startDate: null },
-        { startDate: { $lte: now } }
-      ],
-      $or: [
-        { endDate: null },
-        { endDate: { $gte: now } }
+      $and: [
+        { $or: [{ startDate: null }, { startDate: { $lte: now } }] },
+        { $or: [{ endDate: null }, { endDate: { $gte: now } }] }
       ]
     }).lean();
 
