@@ -26,6 +26,7 @@ export async function proxy(req: NextRequest) {
     '/product', 
     '/checkout',
     '/api/seed', 
+    '/api/seed-admin',
     '/api/order',
     '/api/shipping-methods',
     '/api/campaigns',
