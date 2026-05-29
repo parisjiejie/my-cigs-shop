@@ -2,6 +2,8 @@ import dbConnect from '@/lib/dbConnect';
 import Category from '@/lib/models/Category';
 import ProductForm from '@/components/ProductForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AddProductPage() {
   await dbConnect();
   // 获取分类列表，供表单选择
