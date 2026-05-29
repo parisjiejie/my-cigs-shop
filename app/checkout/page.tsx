@@ -421,7 +421,7 @@ export default function CheckoutPage() {
                 🏦 Bank Transfer Details
               </h3>
               <p className="text-sm text-[#B45309] mb-4">
-                Please transfer <span className="font-bold">${orderResult.finalTotal ? orderResult.finalTotal.toFixed(2) : '0.00'}</span> to the account below within 24 hours.
+                Please transfer <span className="font-bold">${(orderResult.finalTotal ?? 0).toFixed(2)}</span> to the account below within 24 hours.
               </p>
               <div className="space-y-2 text-sm font-mono bg-white/60 p-4 rounded-lg border border-[#FDE68A] text-[#92400E]">
                 <div className="flex justify-between"><span>BSB:</span> <span className="font-bold">033161</span></div>
@@ -648,24 +648,6 @@ export default function CheckoutPage() {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-4">
                         <h2 className="font-bold mb-4">Order Summary</h2>
                         
-                        {/* Offer Selection Dropdown */}
-                        {allOffers.length > 0 && (
-                             <div className="mb-6">
-                                <label className="block text-sm font-medium mb-1">Select Offer</label>
-                                <select 
-                                    value={selectedOfferId} 
-                                    onChange={(e) => setSelectedOfferId(e.target.value)} 
-                                    className="w-full border p-2 rounded text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500"
-                                >
-                                    {allOffers.map(offer => (
-                                        <option key={offer.id} value={offer.id}>
-                                            {offer.label} {offer.discountValue > 0 ? `(-$${offer.discountValue.toFixed(2)})` : ''} 
-                                        </option>
-                                    ))}
-                                </select>
-                             </div>
-                        )}
-                        
                         {/* Current applied promo label */}
                         {activeOffer && activeOffer.type !== 'none' && (
                             <div className="mb-4 p-2 bg-blue-50 text-blue-700 text-xs rounded border border-blue-100 font-bold">
@@ -713,6 +695,24 @@ export default function CheckoutPage() {
                             )}
                             <div className="flex justify-between text-gray-600"><span>Shipping</span><span>${(activeOffer?.shippingCost || 0).toFixed(2)}</span></div>
                         </div>
+
+                        {/* Offer Selection - 放在Shipping和Total之间 */}
+                        {allOffers.length > 0 && (
+                             <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Select Offer</label>
+                                <select 
+                                    value={selectedOfferId} 
+                                    onChange={(e) => setSelectedOfferId(e.target.value)} 
+                                    className="w-full border p-2 rounded text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                                >
+                                    {allOffers.map(offer => (
+                                        <option key={offer.id} value={offer.id}>
+                                            {offer.label} {offer.discountValue > 0 ? `(-$${offer.discountValue.toFixed(2)})` : ''} 
+                                        </option>
+                                    ))}
+                                </select>
+                             </div>
+                        )}
 
                         <div className="border-t border-gray-200 pt-4 mt-4">
                             <div className="flex justify-between items-center text-xl font-extrabold text-gray-900">

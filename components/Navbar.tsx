@@ -111,8 +111,11 @@ export default function Navbar() {
              </span>
           </Link>
           {/* 修复：找回 Logout 按钮 */}
-          <button 
-            onClick={() => signOut()} 
+          <button
+            onClick={async () => {
+              await signOut({ redirect: false });
+              window.location.href = '/';
+            }}
             className="text-xs font-medium text-gray-500 hover:text-red-600 transition"
           >
             Log out

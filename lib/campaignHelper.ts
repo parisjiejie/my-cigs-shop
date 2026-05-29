@@ -134,7 +134,7 @@ export function evaluateAllCampaigns(items: CartItem[], campaigns: Campaign[], b
 
     // --- 策略 2: "每满额减免" (Tiered Discount) ---
     const discountCampaigns = campaigns.filter(c => c.type === 'tiered_discount');
-    if (discountCampaigns.length > 0 && uniqueItemCount >= 2) { 
+    if (discountCampaigns.length > 0 && uniqueItemCount >= 1) { 
         let maxDiscount = 0;
         let bestName = '';
 

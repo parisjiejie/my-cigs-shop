@@ -1,11 +1,14 @@
 import Link from 'next/link';
-// ⚠️ 移除 Image 导入，改用标准 img 标签以避免复杂配置
 import { notFound } from 'next/navigation';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions'; 
+import { authOptions } from '@/lib/authOptions';
 import dbConnect from '@/lib/dbConnect';
 import Order from '@/lib/models/Order';
 import Navbar from '@/components/Navbar';
+import PaymentFormClient from '@/components/PaymentFormClient';
+import PaymentInfoDisplay from '@/components/PaymentInfoDisplay';
+import AdminOrderActions from '@/components/AdminOrderActions';
+import ShippingForm from '@/components/ShippingForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,14 +88,25 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${
-                formattedOrder.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                formattedOrder.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
-                formattedOrder.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                'bg-yellow-100 text-yellow-700'
-              }`}>
-                {formattedOrder.status}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${
+                  formattedOrder.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                  formattedOrder.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
+                  formattedOrder.status === 'Paid' ? 'bg-purple-100 text-purple-700' :
+                  formattedOrder.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                  'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {formattedOrder.status}
+                </span>
+                {userRole === 'admin' && (
+                  <AdminOrderActions
+                    orderId={formattedOrder._id}
+                    orderNumber={formattedOrder.orderNumber}
+                    status={formattedOrder.status}
+                    paymentReminderStopped={formattedOrder.paymentReminderStopped || false}
+                  />
+                )}
+              </div>
               
               {/* 9. 修改：在物流号下面添加物流网站链接 */}
               {formattedOrder.trackingNumber && (
@@ -173,24 +187,50 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
               </div>
             </div>
 
-            {/* 如果未付款，显示转账信息 */}
+            {/* Pending 状态：显示银行转账信息和付款表单 */}
             {formattedOrder.status === 'Pending' && (
-              <div className="mt-8 bg-yellow-50 border border-yellow-200 p-6 rounded-xl">
-                <h3 className="text-yellow-800 font-bold mb-2 flex items-center gap-2">
-                  ⚠️ Payment Pending
-                </h3>
-                <p className="text-yellow-700 text-sm mb-4">
-                  Please transfer the total amount to the account below. Use your <strong>Order Number</strong> as reference.
-                </p>
-                <div className="bg-white/60 p-3 rounded-lg text-sm font-mono text-yellow-900">
-                  <p>BSB: 033161</p>
-                  <p>ACC: 643665</p>
-                  <p>Name: zhen-hong yang</p>
-                  <p>Bank: westpac</p>
-                  <p>Ref: {formattedOrder.orderNumber}</p>
+              <>
+                <div className="mt-8 bg-yellow-50 border border-yellow-200 p-6 rounded-xl">
+                  <h3 className="text-yellow-800 font-bold mb-2 flex items-center gap-2">
+                    ⚠️ Payment Pending
+                  </h3>
+                  <p className="text-yellow-700 text-sm mb-4">
+                    Please transfer the total amount to the account below. Use your <strong>Order Number</strong> as reference.
+                  </p>
+                  <div className="bg-white/60 p-3 rounded-lg text-sm font-mono text-yellow-900">
+                    <p>BSB: 033161</p>
+                    <p>ACC: 643665</p>
+                    <p>Name: zhen-hong yang</p>
+                    <p>Bank: westpac</p>
+                    <p>Ref: {formattedOrder.orderNumber}</p>
+                  </div>
                 </div>
-              </div>
+
+                {/* 客户付款表单 */}
+                <PaymentFormClient order={formattedOrder} />
+              </>
             )}
+
+            {/* Paid / Shipped 状态：显示已提交的付款信息（客户和管理员都能看到） */}
+            {(formattedOrder.status === 'Paid' || formattedOrder.status === 'Shipped') && formattedOrder.payerName && (
+              <PaymentInfoDisplay
+                payerName={formattedOrder.payerName || ''}
+                paymentAmount={formattedOrder.paymentAmount || 0}
+                paymentDate={formattedOrder.paymentDate || ''}
+                paymentReference={formattedOrder.paymentReference || ''}
+                status={formattedOrder.status}
+              />
+            )}
+
+            {/* Paid 状态：管理员可在此处填写发货信息 */}
+            {formattedOrder.status === 'Paid' && userRole === 'admin' && (
+              <ShippingForm
+                orderId={formattedOrder._id}
+                orderNumber={formattedOrder.orderNumber}
+              />
+            )}
+
+            {/* Shipped 状态：物流信息已在头部显示 */}
 
           </div>
         </div>

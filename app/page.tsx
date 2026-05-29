@@ -3,10 +3,9 @@ import Banner from '@/lib/models/Banner';
 import Category from '@/lib/models/Category';
 import Product from '@/lib/models/Product';
 import Settings from '@/lib/models/Settings';
-import Storefront from '@/components/Storefront';
-import StorefrontBrand from '@/components/StorefrontBrand';
+import StorefrontWrapper from '@/components/StorefrontWrapper';
+import StorefrontBrandWrapper from '@/components/StorefrontBrandWrapper';
 import AgeVerificationModal from '@/components/AgeVerificationModal';
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -43,13 +42,11 @@ export default async function Home() {
   return (
     <main>
       <AgeVerificationModal />
-      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading Store...</div>}>
-        {currentTheme === 'brand' ? (
-          <StorefrontBrand banners={banners} categories={categories} products={products} />
-        ) : (
-          <Storefront banners={banners} categories={categories} products={products} />
-        )}
-      </Suspense>
+      {currentTheme === 'brand' ? (
+        <StorefrontBrandWrapper banners={banners} categories={categories} products={products} />
+      ) : (
+        <StorefrontWrapper banners={banners} categories={categories} products={products} />
+      )}
     </main>
   );
 }

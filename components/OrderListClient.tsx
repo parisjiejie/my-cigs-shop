@@ -126,9 +126,8 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
     const ORDER_STATUSES = [
         { value: 'All', label: 'All Statuses' },
         { value: 'Pending', label: 'Pending Payment' },
+        { value: 'Paid', label: 'Paid' },
         { value: 'Shipped', label: 'Shipped' },
-        { value: 'Completed', label: 'Completed' },
-        { value: 'Cancelled', label: 'Cancelled' },
     ];
 
     return (
@@ -225,9 +224,8 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
                                                     >
                                                         Mark Shipped
                                                     </button>
-                                                    {/* 🆕 停止提醒按钮 */}
                                                     {!order.paymentReminderStopped ? (
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleStopReminder(order._id)}
                                                             className="text-[10px] text-gray-400 hover:text-red-500 underline self-center"
                                                         >
@@ -238,6 +236,15 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
                                                             Reminders Stopped
                                                         </span>
                                                     )}
+                                                </div>
+                                            ) : order.status === 'Paid' ? (
+                                                <div className="flex flex-col items-start gap-2">
+                                                    <button
+                                                        onClick={() => handleShipClick(order)}
+                                                        className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700 transition shadow-sm w-full"
+                                                    >
+                                                        Mark Shipped
+                                                    </button>
                                                 </div>
                                             ) : order.status === 'Shipped' ? (
                                                 <div className="text-sm text-blue-600 font-medium">

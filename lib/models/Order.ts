@@ -48,6 +48,13 @@ const OrderSchema = new mongoose.Schema({
   carrier: { type: String },
   shippedAt: { type: Date },
   
+  // 客户提交的付款信息
+  paymentReference: { type: String },  // 汇款参考号
+  paymentDate: { type: Date },          // 汇款日期
+  paymentAmount: { type: Number },      // 汇款金额
+  payerName: { type: String },          // 汇款人姓名
+  paidAt: { type: Date },               // 客户确认付款时间
+
   // 支付备注 (保留)
   paymentProof: { type: String },
 
