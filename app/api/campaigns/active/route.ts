@@ -15,14 +15,16 @@ export async function GET() {
     const now = new Date();
     
     // 查找所有激活的、且在有效期内的活动
+    // 注意：$exists: false 不会匹配 null 值，所以用 null 来匹配无日期限制的情况
     const campaigns = await Campaign.find({
       isActive: true,
       $or: [
-        { startDate: { $exists: false } },
+        { startDate: null },
         { startDate: { $lte: now } }
       ],
-      $and: [
-        { $or: [{ endDate: { $exists: false } }, { endDate: { $gte: now } }] }
+      $or: [
+        { endDate: null },
+        { endDate: { $gte: now } }
       ]
     }).lean();
 
