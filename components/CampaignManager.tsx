@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 interface Product {
   _id: string;
   name: string;
-  categoryName: string;
+  categoryName?: string;
+  category?: string;
 }
 
 interface Campaign {
@@ -179,8 +180,8 @@ export default function CampaignManager({ initialCampaigns }: { initialCampaigns
 
   // 过滤产品列表
   const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) || 
-    p.categoryName.toLowerCase().includes(productSearch.toLowerCase())
+    (p.name || '').toLowerCase().includes(productSearch.toLowerCase()) || 
+    (p.categoryName || '').toLowerCase().includes(productSearch.toLowerCase())
   );
 
   const renderRuleInputs = () => {
@@ -400,7 +401,7 @@ export default function CampaignManager({ initialCampaigns }: { initialCampaigns
                                                 }}
                                                 /> 
                                                 <span className="text-sm">
-                                                    {p.name} <span className="text-gray-400 text-xs ml-1">[{p.categoryName}]</span>
+                                                    {p.name} <span className="text-gray-400 text-xs ml-1">[{p.categoryName || p.category || ''}]</span>
                                                 </span>
                                             </label>
                                             )) : <p className="text-xs text-gray-400">Loading products...</p>}
