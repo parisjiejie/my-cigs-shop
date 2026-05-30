@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/lib/models/Product';
-import Category from '@/lib/models/Category'; 
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +9,7 @@ export async function GET() {
     await dbConnect();
 
     const products = await Product.find({})
+      .populate('category', 'name')
       .sort({ createdAt: -1 })
       .lean();
     
@@ -25,7 +25,8 @@ export async function GET() {
       stock: p.stock,
       lowStockThreshold: p.lowStockThreshold,
       image: p.image || p.images?.[0],
-      category: p.category?.toString()
+      category: p.category?._id?.toString() || p.category?.toString(),
+      categoryName: p.category?.name || ''
     }));
 
     return NextResponse.json(formatted);

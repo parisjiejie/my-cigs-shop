@@ -70,13 +70,11 @@ export async function GET(request: Request) {
             
             <div style="background-color: #fffbeb; border: 1px solid #fcd34d; padding: 15px; border-radius: 6px; color: #92400e; margin: 20px 0;">
                 <h3 style="margin-top: 0; font-size: 16px;">🏦 Bank Transfer Details</h3>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 5px;"><strong>Bank:</strong> Commonwealth Bank</li>
-                    <li style="margin-bottom: 5px;"><strong>Account Name:</strong> My Cigs Trading PTY LTD</li>
-                    <li style="margin-bottom: 5px;"><strong>BSB:</strong> 062-000</li>
-                    <li style="margin-bottom: 5px;"><strong>ACC:</strong> 1234 5678</li>
-                    <li style="margin-top: 10px; color: #d32f2f; font-weight: bold;">Ref / Description: ${order.orderNumber}</li>
-                </ul>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">BSB: 033161</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">ACC: 643665</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">Name: zhen-hong yang</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">Bank: westpac</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px; color: #d32f2f; font-weight: bold;">Ref: ${order.orderNumber}</p>
                 <p style="margin: 10px 0 0 0; font-size: 13px;">* Please include the Order Number as the reference so we can track your payment.</p>
             </div>
             

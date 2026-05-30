@@ -102,13 +102,11 @@ async function sendOrderConfirmationEmails(order: any) {
             <div style="background-color: #fffbeb; border: 1px solid #fcd34d; padding: 15px; border-radius: 6px; color: #92400e;">
                 <h3 style="margin-top: 0; font-size: 16px;">🏦 Bank Transfer Details</h3>
                 <p style="margin: 5px 0; font-size: 14px;">Please transfer the <strong>Total Amount</strong> within 24 hours.</p>
-                <ul style="list-style: none; padding: 0; margin: 10px 0 0 0; font-family: monospace; font-size: 14px;">
-                    <li>Bank: Commonwealth Bank</li>
-                    <li>Name: My Cigs Trading PTY LTD</li>
-                    <li>BSB: 062-000</li>
-                    <li>ACC: 1234 5678</li>
-                    <li>Ref: <strong>${order.orderNumber}</strong></li>
-                </ul>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">BSB: 033161</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">ACC: 643665</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">Name: zhen-hong yang</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">Bank: westpac</p>
+                <p style="margin: 3px 0; font-family: monospace; font-size: 14px;">Ref: <strong>${order.orderNumber}</strong></p>
             </div>
             
             <p style="margin-top: 25px; font-size: 14px; text-align: center; color: #555;">
