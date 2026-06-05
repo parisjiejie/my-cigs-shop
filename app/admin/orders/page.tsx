@@ -9,10 +9,24 @@ export const dynamic = 'force-dynamic';
 // =======================================================
 // Server Data Fetcher Function
 // =======================================================
-async function fetchOrderData(statusFilter: string) {
+async function fetchOrderData(statusFilter: string, startDate?: string, endDate?: string) {
     let query: any = {};
     if (statusFilter && statusFilter !== 'All') {
         query.status = statusFilter;
+    }
+
+    // 日期范围筛选
+    if (startDate || endDate) {
+        query.createdAt = {};
+        if (startDate) {
+            query.createdAt.$gte = new Date(startDate);
+        }
+        if (endDate) {
+            // 结束日期设为当天 23:59:59，包含整天
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            query.createdAt.$lte = end;
+        }
     }
 
     try {
@@ -70,11 +84,11 @@ async function fetchOrderData(statusFilter: string) {
 // =======================================================
 // Next.js Page Entry
 // =======================================================
-export default async function OrdersManagementPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-    const { status } = await searchParams;
+export default async function OrdersManagementPage({ searchParams }: { searchParams: Promise<{ status?: string; startDate?: string; endDate?: string }> }) {
+    const { status, startDate, endDate } = await searchParams;
     const statusFilter = status || 'All';
     
-    const orders = await fetchOrderData(statusFilter); 
+    const orders = await fetchOrderData(statusFilter, startDate, endDate); 
     
     return <OrderListClient orders={orders} />; 
 }

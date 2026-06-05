@@ -84,10 +84,8 @@ export default function CampaignManager({ initialCampaigns }: { initialCampaigns
 
   // 1. 加载产品列表 (带错误提示)
   useEffect(() => {
-    if (showForm && products.length === 0) {
+    if (showForm) {
         setProductLoadError('');
-        // 尝试调用 API
-        // 修复：添加时间戳参数 ?t=... 强制浏览器不使用缓存，确保获取最新数据
         fetch(`/api/admin/product/list?t=${new Date().getTime()}`) 
         .then(res => {
             if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
@@ -96,6 +94,12 @@ export default function CampaignManager({ initialCampaigns }: { initialCampaigns
         .then(data => {
              if (Array.isArray(data)) {
                  setProducts(data);
+                 // 清理已不存在的产品 ID（产品被删除后残留的旧 ID）
+                 const validIds = new Set(data.map((p: Product) => p._id));
+                 setFormData(prev => ({
+                     ...prev,
+                     targetProducts: prev.targetProducts.filter(id => validIds.has(id))
+                 }));
              } else {
                  setProductLoadError('Invalid data format from server');
              }

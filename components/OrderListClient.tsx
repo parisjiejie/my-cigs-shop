@@ -14,9 +14,13 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentStatus = searchParams.get('status') || 'All';
+    const currentStartDate = searchParams.get('startDate') || '';
+    const currentEndDate = searchParams.get('endDate') || '';
 
     // --- State ---
     const [searchTerm, setSearchTerm] = useState('');
+    const [startDate, setStartDate] = useState(currentStartDate);
+    const [endDate, setEndDate] = useState(currentEndDate);
     const [sortKey, setSortKey] = useState<SortKey>('createdAt');
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -54,7 +58,26 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newStatus = e.target.value;
-        router.push(`/admin/orders?status=${newStatus}`);
+        const params = new URLSearchParams(searchParams.toString());
+        if (newStatus === 'All') {
+            params.delete('status');
+        } else {
+            params.set('status', newStatus);
+        }
+        router.push(`/admin/orders?${params.toString()}`);
+    };
+
+    const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+        if (field === 'startDate') setStartDate(value);
+        else setEndDate(value);
+
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+            params.set(field, value);
+        } else {
+            params.delete(field);
+        }
+        router.push(`/admin/orders?${params.toString()}`);
     };
 
     const handleSort = (key: SortKey) => {
@@ -149,6 +172,24 @@ export default function OrderListClient({ orders = [] }: { orders?: any[] }) {
                                 <option key={s.value} value={s.value}>{s.label}</option>
                             ))}
                         </select>
+
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => handleDateChange('startDate', e.target.value)}
+                                className="border border-gray-300 p-2 rounded-lg text-sm h-10 w-36 focus:ring-2 focus:ring-blue-500 outline-none"
+                                title="Start Date"
+                            />
+                            <span className="text-gray-400 text-sm">to</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => handleDateChange('endDate', e.target.value)}
+                                className="border border-gray-300 p-2 rounded-lg text-sm h-10 w-36 focus:ring-2 focus:ring-blue-500 outline-none"
+                                title="End Date"
+                            />
+                        </div>
 
                         <div className="relative">
                             <input 
