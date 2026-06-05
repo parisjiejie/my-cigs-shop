@@ -3,24 +3,22 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function DeleteBannerButton({ id }: { id: string }) {
+export default function DeleteButton({ id }: { id: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    // 增加确认提示
-    if(!confirm('确定删除这张轮播图吗？')) return;
+    if(!confirm('确定删除这个产品吗？')) return;
     
     setLoading(true);
     try {
-      // 调用删除 API
-      const res = await fetch(`/api/admin/banners/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/product/${id}`, { method: 'DELETE' });
       
       if (res.ok) {
-        // 删除成功后刷新页面数据
         router.refresh();
       } else {
-        alert('删除失败');
+        const data = await res.json();
+        alert(data.error || '删除失败');
       }
     } catch (e) {
       console.error(e);

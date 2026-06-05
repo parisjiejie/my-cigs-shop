@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/authOptions';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/lib/models/Product';
 import Category from '@/lib/models/Category';
+import { normalizeSlug, generateSlug } from '@/lib/slugify';
 
 export async function GET(request: NextRequest) {
   try {
@@ -130,10 +131,15 @@ export async function POST(request: NextRequest) {
           row[header] = values[idx] || '';
         });
 
-        if (!row.name || !row.slug) {
+        if (!row.name) {
           results.skipped++;
           continue;
         }
+
+        // 规范化 slug：如果没有填则从 name 生成，否则规范化已有值
+        let importSlug = row.slug
+          ? normalizeSlug(row.slug)
+          : generateSlug(row.name);
 
         let categoryId = row.category ? categoryMap.get(row.category.toLowerCase()) : null;
         if (!categoryId && row.category) {
@@ -144,7 +150,7 @@ export async function POST(request: NextRequest) {
 
         const productData = {
           name: row.name,
-          slug: row.slug,
+          slug: importSlug,
           category: categoryId,
           brand: row.brand || undefined,
           price: parseFloat(row.price) || 0,
@@ -157,7 +163,7 @@ export async function POST(request: NextRequest) {
           specifications: row.specifications || undefined
         };
 
-        const existing = await Product.findOne({ slug: row.slug });
+        const existing = await Product.findOne({ slug: importSlug });
         if (existing) {
           await Product.findByIdAndUpdate(existing._id, productData);
         } else {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import CSVActions from './CSVActions';
 import DeleteButton from '@/components/DeleteButton';
@@ -25,10 +25,44 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  
+  // 筛选状态
+  const [searchName, setSearchName] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterSoldOut, setFilterSoldOut] = useState(false);
+
+  // 批量删除状态
+  const [batchDeleting, setBatchDeleting] = useState(false);
 
   useEffect(() => {
     setProducts(initialProducts);
   }, [initialProducts]);
+
+  // 前端筛选
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      // 名称搜索
+      if (searchName && !p.name.toLowerCase().includes(searchName.toLowerCase())) {
+        return false;
+      }
+      // 分类筛选
+      if (filterCategory && p.category !== filterCategory) {
+        return false;
+      }
+      // Sold Out 筛选
+      if (filterSoldOut && p.stock > 0) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, searchName, filterCategory, filterSoldOut]);
+
+  // 当筛选列表变化时，清除不在当前列表中的选中项
+  useEffect(() => {
+    const visibleIds = new Set(filteredProducts.map(p => p._id));
+    setSelectedIds(prev => prev.filter(id => visibleIds.has(id)));
+    setSelectAll(false);
+  }, [filteredProducts]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -40,7 +74,7 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
     if (selectAll) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(products.map(p => p._id));
+      setSelectedIds(filteredProducts.map(p => p._id));
     }
     setSelectAll(!selectAll);
   };
@@ -59,17 +93,116 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
     }
   };
 
+  const handleBatchDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (!confirm(`确定删除选中的 ${selectedIds.length} 个产品吗？此操作不可撤销！`)) return;
+
+    setBatchDeleting(true);
+    try {
+      const res = await fetch('/api/admin/product/batch-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '删除失败');
+
+      // 刷新列表
+      await refreshProducts();
+    } catch (err: any) {
+      alert(err.message || '批量删除出错');
+    } finally {
+      setBatchDeleting(false);
+    }
+  };
+
+  // 生成分类选项列表（去重）
+  const categoryOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const options: { id: string; name: string }[] = [];
+    products.forEach((p) => {
+      const catId = p.category?.toString() || '';
+      if (catId && !seen.has(catId)) {
+        seen.add(catId);
+        const catName = categoryMap[catId] || catId;
+        options.push({ id: catId, name: catName });
+      }
+    });
+    options.sort((a, b) => a.name.localeCompare(b.name));
+    return options;
+  }, [products, categoryMap]);
+
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-4">
-          <CSVActions productIds={selectedIds} onImportComplete={refreshProducts} />
+      {/* 工具栏：搜索 + 筛选 + 操作按钮 */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* 名称搜索 */}
+          <div className="flex-1 min-w-[200px]">
+            <input
+              type="text"
+              placeholder="🔍 Search product name..."
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* 分类筛选 */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white"
+          >
+            <option value="">All Categories</option>
+            {categoryOptions.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+
+          {/* Sold Out 筛选 */}
+          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer whitespace-nowrap">
+            <input
+              type="checkbox"
+              checked={filterSoldOut}
+              onChange={(e) => setFilterSoldOut(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
+            />
+            Sold Out Only
+          </label>
+
+          {/* 选中计数 */}
+          {selectedIds.length > 0 && (
+            <span className="text-sm text-gray-500 font-medium">
+              {selectedIds.length} selected
+            </span>
+          )}
         </div>
-        <Link href="/admin/products/add" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 font-bold shadow-sm transition-all flex items-center gap-2">
-          <span>+</span> Add Product
-        </Link>
+
+        <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+          <CSVActions productIds={selectedIds} onImportComplete={refreshProducts} />
+
+          {/* 批量删除按钮 */}
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleBatchDelete}
+              disabled={batchDeleting}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium flex items-center gap-2"
+            >
+              {batchDeleting ? '⏳ Deleting...' : `🗑️ Delete (${selectedIds.length})`}
+            </button>
+          )}
+
+          <div className="flex-1" />
+
+          <Link href="/admin/products/add" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 font-bold shadow-sm transition-all flex items-center gap-2 text-sm">
+            <span>+</span> Add Product
+          </Link>
+        </div>
       </div>
 
+      {/* 产品表格 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -78,7 +211,7 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
                 <th className="px-4 py-4 w-10">
                   <input
                     type="checkbox"
-                    checked={selectAll}
+                    checked={selectAll && filteredProducts.length > 0}
                     onChange={toggleSelectAll}
                     className="w-4 h-4 rounded border-gray-300"
                   />
@@ -91,7 +224,7 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {products.map((p) => {
+              {filteredProducts.map((p) => {
                 let categoryName = 'Uncategorized';
                 const catId = p.category?.toString();
                 
@@ -158,10 +291,10 @@ export default function ProductListClient({ initialProducts, categoryMap }: Prod
                   </tr>
                 );
               })}
-              {products.length === 0 && (
+              {filteredProducts.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                    No products found. Start by adding one!
+                    {products.length === 0 ? 'No products found. Start by adding one!' : 'No products match your filters.'}
                   </td>
                 </tr>
               )}
